@@ -1,0 +1,5 @@
+bootloader.c:14:6:execute_img1	0	static,ignoring_inline_asm
+bootloader.c:30:6:execute_img0	0	static,ignoring_inline_asm
+bootloader.c:49:6:meta_data_init	16	static
+bootloader.c:90:10:select_updated_img_to_execute	8	static
+bootloader.c:114:6:execute_img	8	static

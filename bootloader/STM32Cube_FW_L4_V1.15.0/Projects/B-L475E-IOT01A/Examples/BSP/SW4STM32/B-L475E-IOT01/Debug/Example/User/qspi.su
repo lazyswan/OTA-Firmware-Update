@@ -1,0 +1,2 @@
+qspi.c:52:6:QSPI_demo	16	static
+qspi.c:160:6:QSPI_MemoryMapped_demo	32	static
