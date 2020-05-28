@@ -119,14 +119,17 @@ int main(void)
 	printf("-->We Are Inside the Boot loader: \r\n");
 	meta_data_init();
   /* Infinite loop */
-  while (1)
+	select_updated_img_to_execute();
+  /*while (1)
   {
 	   printf("-->Press User button to Jump\r\n");
+
 	   while(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_RESET);
 	   while(BSP_PB_GetState(BUTTON_USER) == GPIO_PIN_SET);
+
 	   select_updated_img_to_execute();
 	   printf("-->!X Some Thing Was Wrong \r\n");
-  }
+  }*/
 
 }
 #endif

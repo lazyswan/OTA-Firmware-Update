@@ -47,7 +47,7 @@
 	#define NEXT_METADATA_ADDRESS			IMG_0_METADATA_START_ADDR
 #endif
 
-const uint32_t current_fw_version = 26;
+const uint32_t current_fw_version = 32;
 //Every image will have a meta-data denoting below information.
 typedef struct meta_data{
 	uint32_t img_strt_add;

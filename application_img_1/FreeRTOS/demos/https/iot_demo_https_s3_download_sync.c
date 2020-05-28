@@ -168,7 +168,7 @@
 uint8_t bootup = false;
 uint8_t mode=VERSION_CHK;
 static uint8_t newVersion = 0;
-extern TaskHandle_t xHandle;
+extern TaskHandle_t xIOT_Handle;
 
 
 
@@ -201,7 +201,18 @@ static uint8_t _pRespUserBuffer[ IOT_DEMO_HTTPS_RESP_USER_BUFFER_SIZE ] = { 0 };
 static uint8_t _pRespBodyBuffer[ IOT_DEMO_HTTPS_RESP_BODY_BUFFER_SIZE ] = { 0 };
 
 /*-----------------------------------------------------------*/
+void suspend_task(TaskHandle_t  task_handle, IotHttpsConnectionHandle_t connHandle ){
+	configPRINTF( ( "Suspending Task due to HTTP error and retrying \r\n"));
 
+	/*if( connHandle != NULL && task_handle!=NULL ){
+        IOT_SET_AND_GOTO_CLEANUP
+		IotHttpsClient_Disconnect( connHandle );
+		vTaskSuspend(task_handle);
+	}*/
+	NVIC_SystemReset();
+
+
+}
 
 
 
@@ -398,7 +409,7 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 
 		/* Initialize the HTTPS library. */
 
-			httpsClientStatus =	IotHttpsClient_Init();
+		httpsClientStatus =	IotHttpsClient_Init();
 
 
 		if(  httpsClientStatus!= IOT_HTTPS_OK)
@@ -464,7 +475,7 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 		/* Here we iterate sending byte range requests until the full file has been downloaded. We keep track of the next
 		 * byte to download with curByte. When this reaches the fileSize we stop downloading.
 		 */
-		vTaskSuspend(xHandle);
+		//vTaskSuspend(xHandle);
 		while( curByte < fileSize )
 		{
 			/* Re-initialize the request to reuse the request. If we do not reinitialize then data from the last response
@@ -505,23 +516,25 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 			}
 
 			/* Send the request and receive the response synchronously. */
-			IotLogInfo( "Now requesting Range: %s.", pRangeValueStr );
+			//IotLogInfo( "Now requesting Range: %s.", pRangeValueStr );
 
 			/* A new response handle is returned from IotHttpsClient_SendSync(). We reuse the respHandle variable because
 			 * the last response was already processed fully.  */
 
-			httpsClientStatus = IotHttpsClient_SendSync( connHandle, reqHandle, &respHandle, &respConfig, 0 );
+			httpsClientStatus = IotHttpsClient_SendSync( connHandle, reqHandle, &respHandle, &respConfig, 5000 );
 			//IotLogInfo( "S#IotHttpsClient_SendSync(): %d\n", httpsClientStatus );
 			/* If there was network error try again one more time. */
 			if( httpsClientStatus == IOT_HTTPS_NETWORK_ERROR )
 			{
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
 				/* Maybe the network error was because the server disconnected us. */
 				httpsClientStatus = IotHttpsClient_Connect( &connHandle, &connConfig );
 				//IotLogInfo( "S#IotHttpsClient_Connect(): %d\n", httpsClientStatus );
 				if( httpsClientStatus != IOT_HTTPS_OK )
 				{
 					IotLogError( "Failed to reconnect to the S3 server after a network error on IotHttpsClient_SendSync(). Error code %d.", httpsClientStatus );
-					IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					suspend_task(xIOT_Handle,connHandle);
 				}
 
 				httpsClientStatus = IotHttpsClient_SendSync( connHandle, reqHandle, &respHandle, &respConfig, IOT_DEMO_HTTPS_SYNC_TIMEOUT_MS );
@@ -529,13 +542,18 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 				if( httpsClientStatus != IOT_HTTPS_OK )
 				{
 					IotLogError( "Failed receiving the response on a second try after a network error. The error code is: %d", httpsClientStatus );
-					IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					suspend_task(xIOT_Handle,connHandle);
 				}
+
 			}
 			else if( httpsClientStatus != IOT_HTTPS_OK )
 			{
+
 				IotLogError( "There has been an error receiving the response. The error code is: %d", httpsClientStatus );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			httpsClientStatus = IotHttpsClient_ReadResponseStatus( respHandle, &respStatus );
@@ -543,13 +561,17 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 			if( httpsClientStatus != IOT_HTTPS_OK )
 			{
 				IotLogError( "Error in retreiving the response status. Error code %d", httpsClientStatus );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			if( respStatus != IOT_HTTPS_STATUS_PARTIAL_CONTENT )
 			{
 				IotLogError( "Failed to retrieve the partial content response from s3. Response status: %d", respStatus );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			/* Get the content length of the body for printing without a NULL terminator. */
@@ -558,7 +580,9 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 			if( httpsClientStatus != IOT_HTTPS_OK )
 			{
 				IotLogError( "Failed to read the Content-Length from the response. Error code %d", httpsClientStatus );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			/* The response has been fully received. */
@@ -588,7 +612,9 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 			if( curByte > fileSize )
 			{
 				IotLogError( "Received more data than the size of the file specified." );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			if( ( fileSize - curByte ) < numReqBytes )
@@ -609,7 +635,9 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 			if( ( httpsClientStatus != IOT_HTTPS_OK ) && ( httpsClientStatus != IOT_HTTPS_NOT_FOUND ) )
 			{
 				IotLogError( "Failed to read header %s. Error code: %d.", CONNECTION_HEADER_FIELD, httpsClientStatus );
-				IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+				xIOT_Handle=xTaskGetCurrentTaskHandle();
+				suspend_task(xIOT_Handle,connHandle);
 			}
 
 			if( strncmp( CONNECTION_CLOSE_HEADER_VALUE, connectionValueStr, CONNECTION_CLOSE_HEADER_VALUE_LENGTH ) == 0 )
@@ -620,11 +648,13 @@ int RunHttpsSyncDownloadDemo( bool awsIotMqttMode,
 				if( httpsClientStatus != IOT_HTTPS_OK )
 				{
 					IotLogError( "Failed to reconnect to the server. Error code: %d.", httpsClientStatus );
-					IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					//IOT_SET_AND_GOTO_CLEANUP( EXIT_FAILURE );
+					xIOT_Handle=xTaskGetCurrentTaskHandle();
+					suspend_task(xIOT_Handle,connHandle);
 				}
 			}
 		}
-		vTaskResume(xHandle);
+		//vTaskResume(xHandle);
 
 		/*if (newVersion > CURRENT_FIRMWARE_VERSION)
 		{

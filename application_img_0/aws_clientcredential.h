@@ -52,7 +52,7 @@ static const char clientcredentialMQTT_BROKER_ENDPOINT[] = "afktlkrksygxa-ats.io
  *
  * @todo If you are using Wi-Fi, set this to your network name.
  */
-#define clientcredentialWIFI_SSID       "AantarJaal"
+#define clientcredentialWIFI_SSID       "JantarMantar"
 
 /*
  * @brief Password needed to join Wi-Fi network.

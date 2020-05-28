@@ -139,6 +139,7 @@ extern uint8_t bootup;
 
 static uint8_t systemInitCheck = false;
 TaskHandle_t xHandle = NULL;
+TaskHandle_t xIOT_Handle= NULL;
 RTC_HandleTypeDef xHrtc;
 RNG_HandleTypeDef xHrng;
 
@@ -199,6 +200,9 @@ void vOTA_Task( void * pvParameters )
 				updateMetadata();
 				performReset();
 				__enable_irq();
+			}
+			if(xIOT_Handle!=NULL){
+				vTaskResume(xIOT_Handle);
 			}
 			else{
 				configPRINTF( ( "OTA Task...\r\n" ) );

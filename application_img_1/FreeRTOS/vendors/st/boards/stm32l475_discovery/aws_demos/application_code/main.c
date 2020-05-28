@@ -138,7 +138,7 @@ extern WIFIReturnCode_t WIFI_GetFirmwareVersion( uint8_t * pucBuffer );
 extern uint8_t bootup;
 
 static uint8_t systemInitCheck = false;
-TaskHandle_t xHandle = NULL;
+TaskHandle_t xIOT_Handle= NULL;
 RTC_HandleTypeDef xHrtc;
 RNG_HandleTypeDef xHrng;
 
@@ -200,6 +200,9 @@ void vOTA_Task( void * pvParameters )
 				performReset();
 				__enable_irq();
 			}
+			if(xIOT_Handle!=NULL){
+				vTaskResume(xIOT_Handle);
+			}
 			else{
 				configPRINTF( ( "OTA Task...\r\n" ) );
 			}
@@ -235,7 +238,7 @@ int main( void )
 			256       ,      /* Stack size in words, not bytes. */
 			( void * ) 1,    /* Parameter passed into the task. */
 			2,               /* Priority at which the task is created. */
-			&xHandle );      /* Used to pass out the created task's handle. */
+			NULL );      /* Used to pass out the created task's handle. */
 
 	/* Start the scheduler.  Initialization that requires the OS to be running,
 	 * including the WiFi initialization, is performed in the RTOS daemon task

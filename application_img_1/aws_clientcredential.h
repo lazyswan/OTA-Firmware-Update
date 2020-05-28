@@ -59,7 +59,7 @@ static const char clientcredentialMQTT_BROKER_ENDPOINT[] = "afktlkrksygxa-ats.io
  *
  * @todo If you are using WPA, set this to your network password.
  */
-#define clientcredentialWIFI_PASSWORD   "MtnlBsnl"
+#define clientcredentialWIFI_PASSWORD   "JantarMantar"
 
 /*
  * @brief Wi-Fi network security type.

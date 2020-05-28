@@ -30,11 +30,10 @@
  * aws s3 presign s3://firmware-stm/aws_demos.bin --expires-in 604800
  */
 
-//VERSION-FILE
-#define IOT_DEMO_HTTPS_PRESIGNED_GET_URL_VER	"https://firmware-stm.s3.us-west-1.amazonaws.com/test_firmware.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVDFFGZQ4HQHVVDU5%2F20200516%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200516T010236Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e36a9ad764c7550c614a355ad752f1f3b81482ea3e7fa58d1ec1352c2aa685ce"
+#define IOT_DEMO_HTTPS_PRESIGNED_GET_URL_VER	"https://firmware-stm.s3.us-west-1.amazonaws.com/test_firmware.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVDFFGZQ4HQHVVDU5%2F20200528%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200528T042625Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5d4467f50b412a77c7c0ec7e5438f7e1d6fc8b6a1b3046d38629bf54c3c4afc1"
 
 //LINK EXPIRES IN 7-DAYS
-#define IOT_DEMO_HTTPS_PRESIGNED_GET_URL_BIN	"https://firmware-stm.s3.us-west-1.amazonaws.com/test_firmware.txt?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVDFFGZQ4HQHVVDU5%2F20200516%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200516T010236Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e36a9ad764c7550c614a355ad752f1f3b81482ea3e7fa58d1ec1352c2aa685ce"
+#define IOT_DEMO_HTTPS_PRESIGNED_GET_URL_BIN	"https://firmware-stm.s3.us-west-1.amazonaws.com/aws_demos.bin?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVDFFGZQ4HQHVVDU5%2F20200528%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200528T042507Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c369d9b98b332d610c41db10124c34d6f4de0a136107fd2d6d5d34b9fbb17de0"
 
 #define IOT_DEMO_HTTPS_PRESIGNED_PUT_URL    "https://firmware-stm.s3.amazonaws.com/aws_demos.bin?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVDFFGZQ4HQHVVDU5%2F20200426%2Fus-west-1%2Fs3%2Faws4_request&X-Amz-Date=20200426T031238Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=bf63b422854b8e4a7bbdce3fe667e5069b1ea631da48f642a6428f023967d60e"
 
